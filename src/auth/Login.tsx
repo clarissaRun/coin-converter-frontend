@@ -18,7 +18,7 @@ export default function Login() {
 
   const onSubmit = async (values: LoginValues) => {
     void values
-    // Reemplaza por tu endpoint real
+    // endpoint 
     // const res = await fetch("/api/login", { ... });
     // if (!res.ok) throw new Error("Credenciales inválidas");
     // const data = await res.json();
