@@ -123,12 +123,6 @@ export default function Home() {
                 {to}
               </div>
             </div>
-
-            {/* Hint */}
-            <p className="text-xs text-gray-500">
-              Tip: actualiza las tasas desde tu backend y guarda el historial
-              para el usuario.
-            </p>
           </div>
         </div>
       </div>
