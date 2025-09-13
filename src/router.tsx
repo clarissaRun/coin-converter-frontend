@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/HomePage";
 import SignUpPage from "./pages/auth/Sign-up";
-import SignInPage from "./pages/auth/Sign-in"; 
+import SignInPage from "./pages/auth/Sign-in";
 
 export default function AppRouter() {
   return (
