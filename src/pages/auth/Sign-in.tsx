@@ -1,21 +1,24 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-import api from "../../lib/api";
+import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "../../context/Auth.context";
 
 const LoginSchema = z.object({
   email: z.string().min(1, "El correo es obligatorio").email("Correo inválido"),
   password: z.string().min(6, "Mínimo 6 caracteres"),
 });
 type LoginValues = z.infer<typeof LoginSchema>;
-type LoginResponse = { access_token: string };
 
 export default function SignIn() {
+  const { login, isLoading, error, user } = useAuthContext();
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     setError,
   } = useForm<LoginValues>({
     resolver: zodResolver(LoginSchema),
@@ -23,41 +26,20 @@ export default function SignIn() {
     defaultValues: { email: "", password: "" },
   });
 
-  const onSubmit = async (values: LoginValues) => {
-    try {
-      const { data } = await api.post<LoginResponse>("/auth/login", values);
-      const token = data?.access_token;
-      if (!token) throw new Error("No se recibió el token");
-      localStorage.setItem("token", token);
-      alert("Inicio de sesión exitoso");
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        const status = err.response?.status;
-        const raw = err.response?.data as unknown;
-
-        let serverMsg = "Error al iniciar sesión. Intenta de nuevo.";
-
-        if (typeof raw === "string") {
-          serverMsg = raw;
-        } else if (raw && typeof raw === "object") {
-          const obj = raw as { message?: unknown; error?: unknown };
-
-          if (Array.isArray(obj.message)) {
-            serverMsg = obj.message.join(", ");
-          } else if (typeof obj.message === "string") {
-            serverMsg = obj.message;
-          } else if (typeof obj.error === "string") {
-            serverMsg = obj.error;
-          }
-        }
-
-        setError("root", {
-          message: status === 401 ? "Credenciales inválidas." : serverMsg,
-        });
-      } else {
-        setError("root", { message: "Ocurrió un error inesperado." });
-      }
+  useEffect(() => {
+    if (error) {
+      setError("root", { message: error });
     }
+  }, [error, setError]);
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
+
+  const onSubmit = async (values: LoginValues) => {
+    await login(values.email, values.password);
   };
 
   return (
@@ -176,10 +158,10 @@ export default function SignIn() {
 
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isLoading}
                   className="inline-flex w-full items-center justify-center rounded-xl bg-gray-900 px-4 py-2.5 font-medium text-white shadow-sm transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {isSubmitting ? "Entrando…" : "Entrar"}
+                  {isLoading ? "Entrando…" : "Entrar"}
                 </button>
 
                 <p className="text-center text-sm text-gray-500">
