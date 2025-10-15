@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 
 // baseURL: .env > (modo dev => localhost) > fallback prod
 const resolved =
@@ -35,5 +35,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   },
 );
-
+export { isAxiosError };
 export default api;
