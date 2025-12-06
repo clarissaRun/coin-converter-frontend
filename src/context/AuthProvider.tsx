@@ -7,6 +7,7 @@ import { AuthContext } from "./Auth.context";
 
 interface JwtPayload {
   sub: string;
+  role: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -38,6 +39,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           email: decodedPayload.email,
           firstName: decodedPayload.firstName,
           lastName: decodedPayload.lastName,
+          role: decodedPayload.role,
         };
         setUser(userFromToken);
       } catch (e) {

@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { api, isAxiosError } from "../lib/api";
 import type { User, UserLogin } from "../models/User";
+import type { RegisterValues } from "../schemas/userSchema";
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -34,10 +35,47 @@ export const useAuth = () => {
     }
   }, []);
 
+  const register = useCallback(async (data: RegisterValues) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await api.post<User>("/auth/register", data);
+
+      return { success: true, error: null };
+    } catch (err) {
+      let errorMessage = "Error al registrar el usuario";
+      if (isAxiosError(err)) {
+        if (Array.isArray(err.response?.data?.message)) {
+          errorMessage = err.response.data.message.join(", ");
+        } else {
+          errorMessage = err.response?.data?.message || err.message;
+        }
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      setError(errorMessage);
+      setUser(null);
+      setToken(null);
+      return { success: false, error: errorMessage };
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const logout = useCallback(() => {
     setToken(null);
     setUser(null);
   }, []);
 
-  return { user, setUser, token, setToken, error, isLoading, login, logout };
+  return {
+    user,
+    setUser,
+    token,
+    setToken,
+    error,
+    isLoading,
+    login,
+    register,
+    logout,
+  };
 };
