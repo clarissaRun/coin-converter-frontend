@@ -1,15 +1,9 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { LoginSchema, type LoginValues } from "../../schemas/userSchema";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../context/Auth.context";
-
-const LoginSchema = z.object({
-  email: z.string().min(1, "El correo es obligatorio").email("Correo inválido"),
-  password: z.string().min(6, "Mínimo 6 caracteres"),
-});
-type LoginValues = z.infer<typeof LoginSchema>;
 
 export default function SignIn() {
   const { login, isLoading, error, user } = useAuthContext();
@@ -70,7 +64,6 @@ export default function SignIn() {
       {/* Main */}
       <main className="mx-auto max-w-7xl px-6 py-16">
         <div className="grid items-center gap-12 lg:grid-cols-12">
-          {/* Col izquierda: Copy / beneficios */}
           <section className="lg:col-span-7">
             <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
               Bienvenido(a) de nuevo.
@@ -87,7 +80,6 @@ export default function SignIn() {
             </div>
           </section>
 
-          {/* Col derecha: Card con el formulario */}
           <section className="lg:col-span-5">
             <div className="mx-auto w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
               <h2 className="text-xl font-semibold text-gray-900">
@@ -95,7 +87,6 @@ export default function SignIn() {
               </h2>
               <p className="mt-1 text-sm text-gray-500">Accede a tu cuenta</p>
 
-              {/* Error general */}
               {errors.root?.message && (
                 <div
                   role="alert"
