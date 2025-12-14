@@ -1,13 +1,12 @@
 import { createContext, useContext } from "react";
-import type { User } from "../models/User";
+import type { User,LoginCredentials } from "../models/User";
 
 export interface AuthContextType {
   login: (
-    email: string,
-    password: string,
+    credentials: LoginCredentials
   ) => Promise<{ success: boolean; error: string | null }>;
   logout: () => void;
-  session: string | null;
+  token: string | null;
   user: User | null;
   error: string | null;
   isLoading: boolean;

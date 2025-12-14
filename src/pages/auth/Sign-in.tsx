@@ -33,9 +33,11 @@ export default function SignIn() {
   }, [user, navigate]);
 
   const onSubmit = async (values: LoginValues) => {
-    await login(values.email, values.password);
+    await login({ 
+      email: values.email, 
+      password: values.password 
+    });
   };
-
   return (
     <div className="w-full bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}

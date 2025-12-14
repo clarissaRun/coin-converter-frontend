@@ -1,13 +1,12 @@
 import React, { useEffect, type ReactNode } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../hooks/useAuth";
-import { useStorageState } from "../hooks/useStorageState";
-import type { User } from "../models/User";
+import type { User, UserRole } from "../models/User"; 
 import { AuthContext } from "./Auth.context";
 
 interface JwtPayload {
   sub: string;
-  role: string;
+  role: UserRole; 
   email: string;
   firstName: string;
   lastName: string;
@@ -17,46 +16,48 @@ interface JwtPayload {
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const { user, setUser, token, setToken, login, logout, error, isLoading } =
-    useAuth();
-
-  const [session, setSession] = useStorageState<string | null>("token", null);
+  const { 
+    user, 
+    setUser, 
+    token, 
+    login, 
+    logout, 
+    register, 
+    error, 
+    isLoading 
+  } = useAuth();
 
   useEffect(() => {
-    if (session) {
-      setToken(session);
-    }
-  }, []);
-
-  useEffect(() => {
-    setSession(token);
-
     if (token) {
       try {
         const decodedPayload = jwtDecode<JwtPayload>(token);
+        
         const userFromToken: User = {
           id: decodedPayload.sub,
           email: decodedPayload.email,
           firstName: decodedPayload.firstName,
           lastName: decodedPayload.lastName,
-          role: decodedPayload.role,
+          role: decodedPayload.role as UserRole,
         };
-        setUser(userFromToken);
+        
+        if (!user || user.id !== userFromToken.id) {
+            setUser(userFromToken);
+        }
+
       } catch (e) {
-        console.error("Token inválido, cerrando sesión:", e);
+        console.error("Token inválido", e);
         logout();
       }
     } else {
-      // Si no hay token, nos aseguramos de que no haya usuario.
-      setUser(null);
+      if (user) setUser(null);
     }
-    // Esta es la única dependencia que necesitamos. Las funciones logout y setUser son estables.
-  }, [token, setSession, setUser, logout]);
+  }, [token, setUser, logout, user]);
 
   const value = {
     login,
     logout,
-    session: token,
+    register,
+    token,
     user,
     error,
     isLoading,

@@ -1,22 +1,20 @@
 import { useState, useCallback } from "react";
 import { api, isAxiosError } from "../lib/api";
-import type { User, UserLogin } from "../models/User";
+import type { User, LoginCredentials,LoginResponse } from "../models/User";
 import type { RegisterValues } from "../schemas/userSchema";
+import { useStorageState } from "./useStorageState";
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useStorageState<string | null>("token", null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (credentials: LoginCredentials) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await api.post<UserLogin>("/auth/login", {
-        email,
-        password,
-      });
+      const response = await api.post<LoginResponse>("/auth/login", credentials);
       setToken(response.data.access_token);
       return { success: true, error: null };
     } catch (err) {
@@ -33,7 +31,7 @@ export const useAuth = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [setToken]);
 
   const register = useCallback(async (data: RegisterValues) => {
     setIsLoading(true);

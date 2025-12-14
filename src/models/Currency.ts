@@ -3,7 +3,7 @@ export type Currency = {
   name: string;
   code: string;
   type: CurrencyType;
-  rate: number;
+  rate: number 
 };
 
 export type CurrencyType = "FIAT" | "CRYPTO";

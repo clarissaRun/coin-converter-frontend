@@ -1,15 +1,22 @@
-export type User = {
+export type UserRole = "ADMIN" | "USER";
+
+export interface User {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
-  role: string;
-};
+  role: UserRole;
+}
 
-export type CreateUser = {
+export type CreateUser = Omit<User, "id" | "createdAt" | "updatedAt"> & {
   password: string;
-} & User;
-
-export type UserLogin = {
-  access_token: string;
 };
+
+export interface LoginResponse {
+  access_token: string;
+  user?: User;
+}
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
